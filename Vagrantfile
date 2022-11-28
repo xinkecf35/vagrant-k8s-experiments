@@ -10,10 +10,44 @@ Vagrant.configure("2") do |config|
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
 
+  config.vm.provider "hyperv"
+
+  # Control Plane/Master Node Resource Configuration
+  config.vm.define "control", primary: true do |control|
+    control.vm.box = "bento/ubuntu-20.04"
+    
+    # Hyper-V Specific Configuration
+    control.vm.provider "hyperv" do |h|
+      # Not needed yet, but utilized differencing disk to speed up creation
+      h.linked_clone = true
+    
+      # Set CPU and Memory to minimum needed for K8S
+      h.cpus = 2
+      h.memory = 4096
+    end
+  end
+
+  # Worker Node(s) Configuration
+  (1..1).each do |i|
+    config.vm.define "worker-#{i}" do |worker|
+      worker.vm.box = "bento/ubuntu-20.04"
+    
+      # Hyper-V Specific Configuration
+      worker.vm.provider "hyperv" do |h|
+        # Not needed yet, but utilized differencing disk to speed up creation
+        h.linked_clone = true
+      
+        # Set CPU and Memory to minimum needed for K8S
+        h.cpus = 2
+        h.memory = 4096
+      end
+    end
+  end
+
+
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "bento/ubuntu-20.04"
-  config.vm.provider "hyperv"
+  
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -24,7 +58,7 @@ Vagrant.configure("2") do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # NOTE: This will enable public access to the opened port
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
+  # config.vm.network "forwarded_port", guest: 80, host: 8080E
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine and only allow access
@@ -45,21 +79,6 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
