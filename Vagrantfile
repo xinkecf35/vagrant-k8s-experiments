@@ -10,7 +10,14 @@ Vagrant.configure("2") do |config|
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
 
-  config.vm.provider "hyperv"
+  # Turning off default key injection out of laziness/not wanting to deal with WSL file permissions caveats
+  # Tl;DR Hyper-V needs this to be mounted in the Windows filesystem but that doesn't support the correct Metadata
+  config.ssh.insert_key = false
+
+  # TODO: since this is Ruby, see if I can set up to either generate or warn if keys aren't present
+  # also how to synchronize with playbook?
+  # NOTE: the insecure key is used just to bootstrap, the playbook will remove it afterwards
+  config.ssh.private_key_path = ["#{Dir.home}/.ssh/vagrant-k8s-experiments", "#{Dir.home}/.vagrant.d/insecure_private_key"]
 
   # Control Plane/Master Node Resource Configuration
   config.vm.define "control", primary: true do |control|
@@ -24,6 +31,11 @@ Vagrant.configure("2") do |config|
       # Set CPU and Memory to minimum needed for K8S
       h.cpus = 2
       h.memory = 4096
+    end
+
+    # Provision node with playbooks
+    control.vm.provision "ansible" do |ansible|
+      ansible.playbook = "ansible/main.yml"
     end
   end
 
@@ -40,6 +52,11 @@ Vagrant.configure("2") do |config|
         # Set CPU and Memory to minimum needed for K8S
         h.cpus = 2
         h.memory = 4096
+      end
+
+      # Provision node with playbooks
+      worker.vm.provision "ansible" do |ansible|
+        ansible.playbook = "ansible/main.yml"
       end
     end
   end
