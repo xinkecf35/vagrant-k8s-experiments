@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+WORKER_COUNT = 1
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
@@ -35,12 +37,12 @@ Vagrant.configure("2") do |config|
 
     # Provision node with playbooks
     control.vm.provision "ansible" do |ansible|
-      ansible.playbook = "ansible/main.yml"
+      ansible.playbook = "ansible/k8s-cluster.yml"
     end
   end
 
   # Worker Node(s) Configuration
-  (1..1).each do |i|
+  (1..WORKER_COUNT).each do |i|
     config.vm.define "worker-#{i}" do |worker|
       worker.vm.box = "bento/ubuntu-20.04"
     
@@ -56,7 +58,7 @@ Vagrant.configure("2") do |config|
 
       # Provision node with playbooks
       worker.vm.provision "ansible" do |ansible|
-        ansible.playbook = "ansible/main.yml"
+        ansible.playbook = "ansible/k8s-cluster.yml"
       end
     end
   end
