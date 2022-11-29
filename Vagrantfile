@@ -2,6 +2,7 @@
 # vi: set ft=ruby :
 
 WORKER_COUNT = 1
+HYPER_V_SWITCH = "Default Switch"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -33,6 +34,9 @@ Vagrant.configure("2") do |config|
       # Set CPU and Memory to minimum needed for K8S
       h.cpus = 2
       h.memory = 4096
+
+      # Set Hyper-V Switch to use; note Default Switch IPs aren't stable
+      control.vm.network "public_network", bridge: HYPER_V_SWITCH
     end
 
     # Provision node with playbooks
@@ -54,6 +58,9 @@ Vagrant.configure("2") do |config|
         # Set CPU and Memory to minimum needed for K8S
         h.cpus = 2
         h.memory = 4096
+
+         # Set Hyper-V Switch to use; note Default Switch IPs aren't stable
+        worker.vm.network "public_network", bridge: HYPER_V_SWITCH
       end
 
       # Provision node with playbooks
