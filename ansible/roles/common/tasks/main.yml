@@ -31,3 +31,6 @@
       - kubectl=*{{ kube_major_version }}*
       - cri-o
       - cri-o-runc
+- name: Disable Swap
+  ansible.builtin.include_tasks:
+    file: "disable-swap.yml"
