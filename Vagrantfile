@@ -2,6 +2,7 @@
 # vi: set ft=ruby :
 
 WORKER_COUNT = 1
+NETWORK_SWITCH_NAME = ""
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -24,15 +25,21 @@ Vagrant.configure("2") do |config|
   # Control Plane/Master Node Resource Configuration
   config.vm.define "control", primary: true do |control|
     control.vm.box = "bento/ubuntu-20.04"
-    
+
+    control.vm.network "forwarded_port", id: "ssh", host: 50241, guest: 22
+
     # Hyper-V Specific Configuration
     control.vm.provider "hyperv" do |h|
       # Not needed yet, but utilized differencing disk to speed up creation
       h.linked_clone = true
-    
+     
       # Set CPU and Memory to minimum needed for K8S
       h.cpus = 2
       h.memory = 4096
+
+      # Explicitly Configure Network/MAC address to try to get stable IPs
+      control.vm.network "public_network", bridge: "Kubernetes", ip: "169.254.0.10"
+      h.mac = "00155D5001E0" # Seems needs to be in the range hyper-V will assign it
     end
 
     # Provision node with playbooks
@@ -46,6 +53,8 @@ Vagrant.configure("2") do |config|
     config.vm.define "worker-#{i}" do |worker|
       worker.vm.box = "bento/ubuntu-20.04"
     
+      worker.vm.network "forwarded_port", id: "ssh", host: 50251 + i, guest: 22
+
       # Hyper-V Specific Configuration
       worker.vm.provider "hyperv" do |h|
         # Not needed yet, but utilized differencing disk to speed up creation
@@ -54,6 +63,10 @@ Vagrant.configure("2") do |config|
         # Set CPU and Memory to minimum needed for K8S
         h.cpus = 2
         h.memory = 4096
+
+        # Explicitly Configure Network/MAC address to try to get stable IPs
+        worker.vm.network "public_network", bridge: "Kubernetes", ip: "169.254.0.#{i + 20}"
+        h.mac = "00155D5002%02x" % i # Seems needs to be in the range hyper-V will assign 
       end
 
       # Provision node with playbooks
