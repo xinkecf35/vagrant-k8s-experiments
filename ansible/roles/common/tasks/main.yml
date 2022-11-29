@@ -1,0 +1,33 @@
+---
+- name: "Copy externally generate public SSH key"
+  ansible.posix.authorized_key:
+    user: vagrant
+    key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/vagrant-k8s-experiments.pub') }}"
+    exclusive: true
+- name: "Update and Upgrade Apt Packages"
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: true
+- name: Setup Kubernetes APT repository
+  block:
+    - name: "Obtain Kubernetes apt gpg key"
+      ansible.builtin.get_url:
+        url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+        dest: "/usr/share/keyrings/kubernetes-archive-keyring.gpg"
+        mode: 0644
+    - name: "Add Kubernetes repository to APT"
+      ansible.builtin.apt_repository:
+        # Why no focal?
+        repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
+        filename: kubernetes
+- name: Setup CRI-O APT repositories
+  ansible.builtin.include_tasks:
+    file: "cri-o.yml"
+- name: Install Kubeadm, CRI-O and related packages
+  ansible.builtin.apt:
+    name:
+      - kubeadm=*{{ kube_major_version }}*
+      - kubelet=*{{ kube_major_version }}*
+      - kubectl=*{{ kube_major_version }}*
+      - cri-o
+      - cri-o-runc
