@@ -24,10 +24,14 @@ Vagrant.configure("2") do |config|
 
   # Control Plane/Master Node Resource Configuration
   config.vm.define "control", primary: true do |control|
+    hostname = "vagrant-k8s-control"
     control.vm.box = "bento/ubuntu-20.04"
+    control.vm.hostname = hostname
     
     # Hyper-V Specific Configuration
     control.vm.provider "hyperv" do |h|
+      h.vmname = hostname
+
       # Not needed yet, but utilized differencing disk to speed up creation
       h.linked_clone = true
     
@@ -41,17 +45,21 @@ Vagrant.configure("2") do |config|
 
     # Provision node with playbooks
     control.vm.provision "ansible" do |ansible|
-      ansible.playbook = "ansible/k8s-cluster.yml"
+      ansible.playbook = "ansible/k8s-control.yml"
     end
   end
 
   # Worker Node(s) Configuration
   (1..WORKER_COUNT).each do |i|
     config.vm.define "worker-#{i}" do |worker|
+      hostname = "vagrant-k8s-worker-#{i}"
       worker.vm.box = "bento/ubuntu-20.04"
+      worker.vm.hostname = hostname
     
       # Hyper-V Specific Configuration
       worker.vm.provider "hyperv" do |h|
+        h.vmname = hostname
+
         # Not needed yet, but utilized differencing disk to speed up creation
         h.linked_clone = true
       
@@ -65,7 +73,7 @@ Vagrant.configure("2") do |config|
 
       # Provision node with playbooks
       worker.vm.provision "ansible" do |ansible|
-        ansible.playbook = "ansible/k8s-cluster.yml"
+        ansible.playbook = "ansible/k8s-worker.yml"
       end
     end
   end
