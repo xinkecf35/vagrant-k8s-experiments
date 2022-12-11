@@ -26,9 +26,9 @@
 - name: Install Kubeadm, CRI-O and related packages
   ansible.builtin.apt:
     name:
-      - kubeadm=*{{ kube_major_version }}*
-      - kubelet=*{{ kube_major_version }}*
-      - kubectl=*{{ kube_major_version }}*
+      - kubeadm={{ kube_pkg_version }}*
+      - kubelet={{ kube_pkg_version }}*
+      - kubectl={{ kube_pkg_version }}*
       - cri-o
       - cri-o-runc
 - name: Disable Swap

@@ -1,0 +1,6 @@
+---
+- name: "Initialize control plane node"
+  ansible.builtin.shell:
+  args:
+    cmd: "kubeadm init --node-name {{ ansible_hostname }} --pod-network-cidr=10.244.0.0/16"
+    creates: /etc/kubernetes/manifests/*

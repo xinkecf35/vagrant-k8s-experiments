@@ -1,0 +1,7 @@
+---
+- name: Main/Base Config
+  hosts: all
+  become: true
+  roles:
+    - common
+    - control

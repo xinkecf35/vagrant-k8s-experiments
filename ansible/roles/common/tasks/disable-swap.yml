@@ -1,0 +1,13 @@
+# taken from https://github.com/freehck/ansible-role-disable-swap/blob/master/tasks/main.yml
+# and https://github.com/geerlingguy/ansible-role-swap/blob/master/tasks/disable.yml
+---
+- name: disable swap
+  command: swapoff -a
+  changed_when: true
+  when: ansible_swaptotal_mb > 0
+
+- name: remove swap from fstab
+  lineinfile:
+    path: '/etc/fstab'
+    regexp: '\sswap\s'
+    state: 'absent'
