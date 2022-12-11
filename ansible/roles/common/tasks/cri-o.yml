@@ -3,6 +3,7 @@
   ansible.builtin.stat:
     path: /usr/share/keyrings/libcontainers-archive-keyring.gpg
   register: is_archive_keyring_present
+
 - name: "Setup CRI-O libcontainers-archive-keyring"
   when: not is_archive_keyring_present.stat.exists
   block:
