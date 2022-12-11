@@ -38,7 +38,7 @@
 - name: Hold Kubernetes packages
   ansible.builtin.dpkg_selections:
     name: "{{ item }}"
-    action: "hold"
+    selection: "hold"
   loop:
     - kubeadm
     - kubelet
