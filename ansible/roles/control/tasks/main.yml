@@ -4,3 +4,10 @@
   args:
     cmd: "kubeadm init --node-name {{ ansible_hostname }} --pod-network-cidr=10.244.0.0/16"
     creates: /etc/kubernetes/manifests/*
+  register: kube_init
+- name: "Show kubeadm init output"
+  ansible.builtin.debug:
+    var: kube_init.stdout_lines
+- name: "Install Flannel CNI"
+  ansible.builtin.import_tasks:
+    file: "flannel.yml"
