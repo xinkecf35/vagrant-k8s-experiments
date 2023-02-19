@@ -1,5 +1,5 @@
 ---
-- name: Main/Base Config
+- name: Worker Setup
   hosts: all
   become: true
   roles:
