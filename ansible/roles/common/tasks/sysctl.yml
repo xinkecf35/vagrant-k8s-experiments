@@ -1,0 +1,16 @@
+---
+- name: Ensure br_netfilter is enabled.
+  community.general.modprobe:
+    name: br_netfilter
+    state: present
+- name: Enable Kernel Parameters
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+  loop: "{{ kernel_params | dict2items }}"
+  vars:
+    kernel_params:
+      "net.ipv4.conf.all.route_localnet": "1"
+      "net.ipv4.ip_forward": "1"
+      "net.bridge.bridge-nf-call-iptables": "1"

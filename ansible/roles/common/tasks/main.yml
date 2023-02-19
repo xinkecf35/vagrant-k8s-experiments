@@ -47,9 +47,18 @@
 - name: Disable Swap
   ansible.builtin.include_tasks:
     file: "disable-swap.yml"
+- name: Enable Kernel Parameters
+  ansible.builtin.include_tasks:
+    file: "sysctl.yml"
 
 - name: Enable and Start CRI-O service
   ansible.builtin.systemd:
     unit: crio
+    enabled: true
+    state: started
+
+- name: Enable and Start kubelet service
+  ansible.builtin.systemd:
+    unit: kubelet
     enabled: true
     state: started
