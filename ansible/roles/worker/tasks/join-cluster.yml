@@ -1,0 +1,22 @@
+---
+- name: "Join newly-built worker"
+  when: worker_node["resources"] | length != 1
+  block:
+  - name: "Make temporary location for kubeconfig/discovery file"
+    ansible.builtin.tempfile:
+      state: directory
+    register: tmp_dir
+  - name: "Copy discovery file to worker node"
+    ansible.builtin.copy:
+      src: "{{ project_kubeconfig_path }}"
+      dest: "{{ tmp_dir.path }}/discovery"
+      mode: 0600
+    register: discovery_config
+  - name: "Join worker node to cluster"
+    ansible.builtin.command:
+      cmd: "kubeadm join --node-name {{ ansible_hostname }} --discovery-file {{ discovery_config.dest }}"
+    changed_when: worker_node["resources"] | length != 1
+  - name: "Remove discovery file"
+    ansible.builtin.file:
+      state: absent
+      path: "{{ tmp_dir.path }}"

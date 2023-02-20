@@ -1,0 +1,31 @@
+---
+- name: "Find node for this node name/hostname"
+  become_user: "{{ lookup('env', 'USER') }}"
+  become: true
+  delegate_to: localhost
+  register: worker_node
+  kubernetes.core.k8s_info:
+    kind: Node
+    api_version: v1
+    kubeconfig: "{{ project_kubeconfig_path }}"
+    name: "{{ ansible_hostname }}"
+- name: "Join cluster"
+  ansible.builtin.import_tasks:
+    file: "join-cluster.yml"
+- name: "Label node as worker node"
+  become_user: "{{ lookup('env', 'USER') }}"
+  become: true
+  delegate_to: localhost
+  kubernetes.core.k8s:
+    kind: Node
+    version: v1
+    kubeconfig: "{{ project_kubeconfig_path }}"
+    state: patched
+    name: "{{ ansible_hostname }}"
+    definition:
+      metadata:
+        labels:
+          "node-role.kubernetes.io/worker": worker
+  changed_when: (worker_metadata is defined) and (worker_metadata == "worker")
+  vars:
+    worker_metadata: worker_node["resources"][0]["metadata"]["node-role.kubernetes.io/worker"]

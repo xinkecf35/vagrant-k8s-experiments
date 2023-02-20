@@ -1,0 +1,2 @@
+---
+project_kubeconfig_path: "{{ playbook_dir }}/../.kube/default"
