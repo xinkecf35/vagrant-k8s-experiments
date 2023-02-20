@@ -5,9 +5,12 @@
     cmd: "kubeadm init --node-name {{ ansible_hostname }} --pod-network-cidr=10.244.0.0/16"
     creates: /etc/kubernetes/manifests/*
   register: kube_init
-- name: "Grab kubeconfig"
-  ansible.builtin.import_tasks:
-    file: "kubeconfig.yml"
+- name: "Fetch admin kubeconfig form control node"
+  ansible.builtin.fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ project_kubeconfig_path }}"
+    flat: true
+  register: kubeconfig
 - name: "Install Flannel CNI"
   ansible.builtin.import_tasks:
     file: "flannel.yml"

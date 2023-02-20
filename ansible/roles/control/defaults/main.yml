@@ -1,2 +1,2 @@
 ---
-dot_kube_dir: "{{ playbook_dir }}/../.kube"
+project_kubeconfig_path: "{{ playbook_dir }}/../.kube/default"

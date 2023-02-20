@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
 
   # Define .kube directory for this project
   # Could have Ruby create this for me, but doing it in Ansible solved an odd issue I was having
-  dot_kube_dir_path = "#{File.dirname(__FILE__)}/.kube/"
+  project_kubeconfig_path = "#{File.dirname(__FILE__)}/.kube/kubeconfig-admin"
 
   config.vm.define "control", primary: true do |control|
     hostname = "vagrant-k8s-control"
@@ -49,9 +49,9 @@ Vagrant.configure("2") do |config|
     # Provision node with playbooks
     control.vm.provision "ansible" do |ansible|
       ansible.playbook = "ansible/k8s-control.yml"
-      # ansible.extra_vars = {
-      #   dot_kube_dir: "#{dot_kube_dir_path}"
-      # }
+      ansible.extra_vars = {
+        project_kubeconfig_path: project_kubeconfig_path
+      }
     end 
   end
 
