@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-WORKER_COUNT = 1
+WORKER_COUNT = 2
 HYPER_V_SWITCH = "Default Switch"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
@@ -77,9 +77,15 @@ Vagrant.configure("2") do |config|
         worker.vm.network "public_network", bridge: HYPER_V_SWITCH
       end
 
-      # Provision node with playbooks
-      worker.vm.provision "ansible" do |ansible|
-        ansible.playbook = "ansible/k8s-worker.yml"
+      # Provision nodes with playbooks
+      if i == WORKER_COUNT
+        worker.vm.provision "ansible" do |ansible|
+          ansible.playbook = "ansible/k8s-worker.yml"
+          ansible.limit = (1..WORKER_COUNT).to_a.map { |i| "worker-#{i}" }
+          ansible.extra_vars = {
+            project_kubeconfig_path: project_kubeconfig_path
+          }
+        end
       end
     end
   end
