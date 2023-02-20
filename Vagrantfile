@@ -22,7 +22,10 @@ Vagrant.configure("2") do |config|
   # NOTE: the insecure key is used just to bootstrap, the playbook will remove it afterwards
   config.ssh.private_key_path = ["#{Dir.home}/.ssh/vagrant-k8s-experiments", "#{Dir.home}/.vagrant.d/insecure_private_key"]
 
-  # Control Plane/Master Node Resource Configuration
+  # Define .kube directory for this project
+  # Could have Ruby create this for me, but doing it in Ansible solved an odd issue I was having
+  dot_kube_dir_path = "#{File.dirname(__FILE__)}/.kube/"
+
   config.vm.define "control", primary: true do |control|
     hostname = "vagrant-k8s-control"
     control.vm.box = "bento/ubuntu-20.04"
@@ -46,7 +49,10 @@ Vagrant.configure("2") do |config|
     # Provision node with playbooks
     control.vm.provision "ansible" do |ansible|
       ansible.playbook = "ansible/k8s-control.yml"
-    end
+      # ansible.extra_vars = {
+      #   dot_kube_dir: "#{dot_kube_dir_path}"
+      # }
+    end 
   end
 
   # Worker Node(s) Configuration

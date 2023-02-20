@@ -1,0 +1,2 @@
+---
+dot_kube_dir: "{{ playbook_dir }}/../.kube"

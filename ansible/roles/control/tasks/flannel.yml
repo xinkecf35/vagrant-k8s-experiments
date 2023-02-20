@@ -1,29 +1,20 @@
 ---
-- name: "Create temporary destination for Flannel Install"
-  ansible.builtin.tempfile:
-    state: directory
+- name: "Install Flannel with kubectl on controller"
   become_user: "{{ lookup('env', 'USER') }}"
   become: true
   delegate_to: localhost
-  register: tmp_dir
-- name: "Download Flannel Manifest"
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/flannel-io/flannel/v0.20.2/Documentation/kube-flannel.yml
-    dest: "{{ tmp_dir.path }}"
-    mode: '0644'
-  become_user: "{{ lookup('env', 'USER') }}"
-  become: true
-  delegate_to: localhost
-  register: flannel_manifest_file
-- name: "Fetch Admin Kubeconfig form root node"
-  ansible.builtin.fetch:
-    src: /etc/kubernetes/admin.conf
-    dest: "{{ tmp_dir.path }}"
-  register: kubeconfig
-- name: Apply Flannel Manifest
-  kubernetes.core.k8s:
-    kubeconfig: "{{ kubeconfig.dest }}"
-    src: "{{ flannel_manifest_file.dest }}"
-  become_user: "{{ lookup('env', 'USER') }}"
-  become: true
-  delegate_to: localhost
+  block:
+    - name: "Create temporary destination for Flannel Install"
+      ansible.builtin.tempfile:
+        state: directory
+      register: tmp_dir
+    - name: "Download Flannel Manifest"
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/flannel-io/flannel/v0.20.2/Documentation/kube-flannel.yml
+        dest: "{{ tmp_dir.path }}"
+        mode: '0644'
+      register: flannel_manifest_file
+    - name: Apply Flannel Manifest
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig.dest }}"
+        src: "{{ flannel_manifest_file.dest }}"
