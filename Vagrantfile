@@ -5,6 +5,7 @@ WORKER_COUNT = 2
 HYPER_V_SWITCH = "Default Switch"
 X86_VAGRANT_BOX = "bento/ubuntu-20.04"
 ARM64_VAGRANT_BOX = "bento/ubuntu-20.04-arm64"
+VAGRANT_BOX = (RUBY_PLATFORM.include? "arm64") ? ARM64_VAGRANT_BOX : X86_VAGRANT_BOX
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -30,11 +31,11 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "control", primary: true do |control|
     hostname = "vagrant-k8s-control"
-    control.vm.box = ARM64_VAGRANT_BOX
+    control.vm.box = VAGRANT_BOX
     control.vm.hostname = hostname
     
     # Hyper-V Specific Configuration
-    control.vm.provider "hyperv" do |h|
+    control.vm.provider "hyperv" do |h, override|
       h.vmname = hostname
 
       # Not needed yet, but utilized differencing disk to speed up creation
@@ -45,7 +46,7 @@ Vagrant.configure("2") do |config|
       h.memory = 4096
 
       # Set Hyper-V Switch to use; note Default Switch IPs aren't stable
-      control.vm.network "public_network", bridge: HYPER_V_SWITCH
+      override.vm.network "public_network", bridge: HYPER_V_SWITCH
     end
 
     control.vm.provider "parallels" do |p|
@@ -70,11 +71,11 @@ Vagrant.configure("2") do |config|
   (1..WORKER_COUNT).each do |i|
     config.vm.define "worker-#{i}" do |worker|
       hostname = "vagrant-k8s-worker-#{i}"
-      worker.vm.box = ARM64_VAGRANT_BOX
+      worker.vm.box = VAGRANT_BOX
       worker.vm.hostname = hostname
     
       # Hyper-V Specific Configuration
-      worker.vm.provider "hyperv" do |h|
+      worker.vm.provider "hyperv" do |h, override|
         h.vmname = hostname
 
         # Not needed yet, but utilized differencing disk to speed up creation
@@ -85,7 +86,7 @@ Vagrant.configure("2") do |config|
         h.memory = 4096
 
          # Set Hyper-V Switch to use; note Default Switch IPs aren't stable
-        worker.vm.network "public_network", bridge: HYPER_V_SWITCH
+        override.vm.network "public_network", bridge: HYPER_V_SWITCH
       end
 
       worker.vm.provider "parallels" do |p|
