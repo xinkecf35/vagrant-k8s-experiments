@@ -1,2 +1,3 @@
 ---
+advertise_ip: '10.255.0.10'
 project_kubeconfig_path: "{{ playbook_dir }}/../.kube/default"

@@ -5,7 +5,8 @@ WORKER_COUNT = 2
 HYPER_V_SWITCH = "Default Switch"
 X86_VAGRANT_BOX = "bento/ubuntu-20.04"
 ARM64_VAGRANT_BOX = "bento/ubuntu-20.04-arm64"
-VAGRANT_BOX = (RUBY_PLATFORM.include? "arm64") ? ARM64_VAGRANT_BOX : X86_VAGRANT_BOX
+# VAGRANT_BOX = (`arch`.include? "arm64") ? ARM64_VAGRANT_BOX : X86_VAGRANT_BOX
+VAGRANT_BOX = "bento/ubuntu-20.04-arm64"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -31,8 +32,14 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "control", primary: true do |control|
     hostname = "vagrant-k8s-control"
+    private_ip = "10.255.0.10"
     control.vm.box = VAGRANT_BOX
     control.vm.hostname = hostname
+
+    # Configure general private networking
+    control.vm.network "public_network"
+    control.vm.network "private_network", ip: private_ip
+    control.vm.network :forwarded_port, guest: 22, host: 2200, id: "ssh", auto_correct: true
     
     # Hyper-V Specific Configuration
     control.vm.provider "hyperv" do |h, override|
@@ -49,20 +56,21 @@ Vagrant.configure("2") do |config|
       override.vm.network "public_network", bridge: HYPER_V_SWITCH
     end
 
-    control.vm.provider "parallels" do |p|
+    control.vm.provider "parallels" do |p, override|
       p.name = hostname
 
       p.cpus = 2
       p.memory = 4096
 
-      # TODO: set networking + static ip?
+      p.check_guest_tools = false
     end
 
     # Provision node with playbooks
     control.vm.provision "ansible" do |ansible|
       ansible.playbook = "ansible/k8s-control.yml"
       ansible.extra_vars = {
-        project_kubeconfig_path: project_kubeconfig_path
+        project_kubeconfig_path: project_kubeconfig_path,
+        advertise_ip: private_ip
       }
     end 
   end
@@ -74,6 +82,10 @@ Vagrant.configure("2") do |config|
       worker.vm.box = VAGRANT_BOX
       worker.vm.hostname = hostname
     
+      # Configure general private networking
+      worker.vm.network "private_network", ip: "10.255.0.#{i + 10}"
+      worker.vm.network :forwarded_port, guest: 22, host: 3200 + i, id: "ssh", auto_correct: true
+
       # Hyper-V Specific Configuration
       worker.vm.provider "hyperv" do |h, override|
         h.vmname = hostname
@@ -94,7 +106,8 @@ Vagrant.configure("2") do |config|
   
         p.cpus = 2
         p.memory = 4096
-  
+        
+        p.check_guest_tools = false
         # TODO: set networking + static ip?
       end
 
