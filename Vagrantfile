@@ -7,6 +7,7 @@ X86_VAGRANT_BOX = "bento/ubuntu-20.04"
 ARM64_VAGRANT_BOX = "bento/ubuntu-20.04-arm64"
 # VAGRANT_BOX = (`arch`.include? "arm64") ? ARM64_VAGRANT_BOX : X86_VAGRANT_BOX
 VAGRANT_BOX = "bento/ubuntu-20.04-arm64"
+VAGRANT_BOX_VERSION = "202112.19.0"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -31,15 +32,18 @@ Vagrant.configure("2") do |config|
   project_kubeconfig_path = "#{File.dirname(__FILE__)}/.kube/kubeconfig-admin"
 
   config.vm.define "control", primary: true do |control|
-    hostname = "vagrant-k8s-control"
-    private_ip = "10.255.0.10"
     control.vm.box = VAGRANT_BOX
+    if !VAGRANT_BOX_VERSION.empty? 
+      control.vm.box_version = VAGRANT_BOX_VERSION
+    end 
+
+    hostname = "vagrant-k8s-control"
+    bridged_ip = "10.211.55.10"
+    private_ip = "10.255.0.10"
     control.vm.hostname = hostname
 
     # Configure general private networking
-    control.vm.network "public_network"
     control.vm.network "private_network", ip: private_ip
-    control.vm.network :forwarded_port, guest: 22, host: 2200, id: "ssh", auto_correct: true
     
     # Hyper-V Specific Configuration
     control.vm.provider "hyperv" do |h, override|
@@ -78,13 +82,16 @@ Vagrant.configure("2") do |config|
   # Worker Node(s) Configuration
   (1..WORKER_COUNT).each do |i|
     config.vm.define "worker-#{i}" do |worker|
-      hostname = "vagrant-k8s-worker-#{i}"
       worker.vm.box = VAGRANT_BOX
+      if !VAGRANT_BOX_VERSION.empty? 
+        worker.vm.box_version = VAGRANT_BOX_VERSION
+      end 
+
+      hostname = "vagrant-k8s-worker-#{i}"
       worker.vm.hostname = hostname
     
       # Configure general private networking
       worker.vm.network "private_network", ip: "10.255.0.#{i + 10}"
-      worker.vm.network :forwarded_port, guest: 22, host: 3200 + i, id: "ssh", auto_correct: true
 
       # Hyper-V Specific Configuration
       worker.vm.provider "hyperv" do |h, override|
@@ -101,14 +108,13 @@ Vagrant.configure("2") do |config|
         override.vm.network "public_network", bridge: HYPER_V_SWITCH
       end
 
-      worker.vm.provider "parallels" do |p|
+      worker.vm.provider "parallels" do |p, override|
         p.name = hostname
   
         p.cpus = 2
         p.memory = 4096
         
         p.check_guest_tools = false
-        # TODO: set networking + static ip?
       end
 
       # Provision nodes with playbooks
@@ -123,48 +129,4 @@ Vagrant.configure("2") do |config|
       end
     end
   end
-
-
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://vagrantcloud.com/search.
-  
-
-  # Disable automatic box update checking. If you disable this, then
-  # boxes will only be checked for updates when the user runs
-  # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
-
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # NOTE: This will enable public access to the opened port
-  # config.vm.network "forwarded_port", guest: 80, host: 8080E
-
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine and only allow access
-  # via 127.0.0.1 to disable public access
-  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.10"
-
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network "public_network"
-
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  # config.vm.synced_folder "../data", "/vagrant_data"
-
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SHELL
 end
