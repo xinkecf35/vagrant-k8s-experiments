@@ -36,7 +36,7 @@
       block:
         - name: Download CRI-O key cri-o-apt-keyring
           ansible.builtin.get_url:
-            url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ cri_o_os }}/Release.key"
+            url: "https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ cri_o_major_version }}/deb/Release.key"
             dest: "/tmp/cri-o-apt-keyring.asc"
             mode: "0644"
         - name: "Dearmor CRI-O key cri-o-apt-keyring"
