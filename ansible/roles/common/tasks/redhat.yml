@@ -6,15 +6,17 @@
     update_only: true
 
 # Disable Swap, mechanism is different as Fedora uses ZRAM/creates a RAM drive...
-- name: Disable swap immediately
-  ansible.builtin.systemd:
-    unit: swap-create@zram0
-    enabled: false
-    state: stopped
+# - name: Disable swap immediately
+#   ansible.builtin.systemd:
+#     unit: swap-create@zram0
+#     enabled: false
+#     state: stopped
 
 - name: Remove ZRAM generator defaults
   ansible.builtin.dnf:
-    name: zram-generator-defaults
+    name:
+      - zram-generator
+      - zram-generator-defaults
     state: absent
 
 - name: Add Kubernetes Repository
@@ -27,12 +29,6 @@
     gpgcheck: true
     gpgkey:
       - https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/rpm/repodata/repomd.xml.key
-    exclude:
-      - kubeadm
-      - kubelet
-      - kubectl
-      - cri-tools
-      - kubernetes-cni
 
 - name: Add CRI-O Repository
   ansible.builtin.yum_repository:
@@ -55,4 +51,3 @@
       - crun-wasm
     allow_downgrade: true
     state: present
-    disable_excludes: kubernetes
