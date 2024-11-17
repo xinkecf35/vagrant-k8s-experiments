@@ -10,22 +10,23 @@
       --pod-network-cidr=10.244.0.0/16
     creates: /etc/kubernetes/manifests/*
   register: kube_init
-- name: "Fetch admin kubeconfig form control node"
+
+- name: "Fetch admin kubeconfig from control node"
   ansible.builtin.fetch:
     src: /etc/kubernetes/admin.conf
     dest: "{{ project_kubeconfig_path }}"
     flat: true
-  register: kubeconfig
+  register: admin_kubeconfig
 
-# Technically not needed for Parrallels, but hoping it will give me consistent access for all providers
-- name: Remap private ip address to 127.0.0.1
-  become_user: "{{ lookup('env', 'USER') }}"
-  become: true
-  delegate_to: localhost
-  ansible.builtin.replace:
-    path: "{{ project_kubeconfig_path }}"
-    regexp: "{{ private_ip | regex_escape() }}"
-    replace: 127.0.0.1
+# # Technically not needed for Parrallels, but hoping it will give me consistent access for all providers
+# - name: Remap private ip address to 127.0.0.1
+#   become_user: "{{ lookup('env', 'USER') }}"
+#   become: true
+#   delegate_to: localhost
+#   ansible.builtin.replace:
+#     path: "{{ project_kubeconfig_path }}"
+#     regexp: "{{ private_ip | regex_escape() }}"
+#     replace: 127.0.0.1
 
 - name: "Label node as worker node as well as control"
   become_user: "{{ lookup('env', 'USER') }}"
