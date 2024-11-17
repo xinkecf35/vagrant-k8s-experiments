@@ -2,7 +2,11 @@
 - name: "Initialize control plane node"
   ansible.builtin.command:
   args:
-    cmd: "kubeadm init --node-name {{ ansible_hostname }} --pod-network-cidr=10.244.0.0/16"
+    cmd: >-
+      kubeadm init
+      --apiserver-advertise-address {{ advertise_ip }}
+      --node-name {{ ansible_hostname }}
+      --pod-network-cidr=10.244.0.0/16
     creates: /etc/kubernetes/manifests/*
   register: kube_init
 - name: "Fetch admin kubeconfig form control node"
