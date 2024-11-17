@@ -3,7 +3,7 @@
   block:
     - name: Template and copy NetworkManager Keyfile
       ansible.builtin.template:
-        src: nm-keyfile.conf.js
+        src: nm-keyfile.ini.j2
         dest: /etc/NetworkManager/system-connections/private-vagrant-interface.nmconnection
         mode: "0644"
         owner: root
