@@ -1,3 +1,4 @@
 ---
+private_ip: '10.37.132.254'
 kube_major_version: '1.30'
 cri_o_major_version: '1.30'

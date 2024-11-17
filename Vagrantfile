@@ -37,11 +37,11 @@ Vagrant.configure("2") do |config|
 
     hostname = "vagrant-k8s-control"
     bridged_ip = "10.211.55.10"
-    private_ip = "10.255.0.10"
+    private_ip = "10.37.132.10"
     control.vm.hostname = hostname
 
     # Configure general private networking
-    control.vm.network "private_network", ip: private_ip
+    control.vm.network "private_network", ip: private_ip, auto_config: false
     control.vm.network "forwarded_port", guest: 6443, host: 6443
     
     # Hyper-V Specific Configuration
@@ -73,7 +73,8 @@ Vagrant.configure("2") do |config|
       ansible.playbook = "ansible/k8s-control.yml"
       ansible.extra_vars = {
         project_kubeconfig_path: project_kubeconfig_path,
-        advertise_ip: private_ip
+        advertise_ip: private_ip,
+        private_ip: private_ip
       }
     end 
   end
@@ -87,10 +88,11 @@ Vagrant.configure("2") do |config|
       end 
 
       hostname = "vagrant-k8s-worker-#{i}"
+      private_ip = "10.37.132.#{i + 10}"
       worker.vm.hostname = hostname
-    
+      
       # Configure general private networking
-      worker.vm.network "private_network", ip: "10.255.0.#{i + 10}"
+      worker.vm.network "private_network", ip: private_ip, auto_config: false
 
       # Hyper-V Specific Configuration
       worker.vm.provider "hyperv" do |h, override|
@@ -122,7 +124,8 @@ Vagrant.configure("2") do |config|
           ansible.playbook = "ansible/k8s-worker.yml"
           ansible.limit = (1..WORKER_COUNT).to_a.map { |i| "worker-#{i}" }
           ansible.extra_vars = {
-            project_kubeconfig_path: project_kubeconfig_path
+            project_kubeconfig_path: project_kubeconfig_path,
+            private_ip: private_ip
           }
         end
       end

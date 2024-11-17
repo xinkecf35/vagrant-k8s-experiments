@@ -1,4 +1,18 @@
 ---
+- name: Configure private interface eth1 with static ip
+  block:
+    - name: Template and copy NetPlan Config
+      ansible.builtin.template:
+        src: netplan.yaml.j2
+        dest: /etc/netplan/99-private-vagrant-interface.yaml
+        mode: "0644"
+        owner: root
+        group: root
+    - name: Apply new interface config
+      ansible.builtin.command:
+        netplan apply
+      changed_when: true
+
 # taken from https://github.com/freehck/ansible-role-disable-swap/blob/master/tasks/main.yml
 # and https://github.com/geerlingguy/ansible-role-swap/blob/master/tasks/disable.yml
 - name: Disable swap immediately
