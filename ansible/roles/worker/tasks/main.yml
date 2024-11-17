@@ -25,7 +25,7 @@
     definition:
       metadata:
         labels:
-          "node-role.kubernetes.io/worker": worker
+          "node-role.kubernetes.io/worker": ""
   changed_when: (worker_metadata is defined) and (worker_metadata == "worker")
   vars:
     worker_metadata: worker_node["resources"][0]["metadata"]["node-role.kubernetes.io/worker"]

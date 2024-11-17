@@ -10,7 +10,7 @@
       register: tmp_dir
     - name: "Download Flannel Manifest"
       ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/flannel-io/flannel/v0.20.2/Documentation/kube-flannel.yml
+        url: https://raw.githubusercontent.com/flannel-io/flannel/v0.26.1/Documentation/kube-flannel.yml
         dest: "{{ tmp_dir.path }}"
         mode: "0644"
       register: flannel_manifest_file

@@ -16,7 +16,6 @@
         state: present
         conn_reload: true
 
-
 - name: Update Packages
   ansible.builtin.dnf:
     name: "*"
@@ -32,6 +31,7 @@
   loop:
     - systemd-zram-setup@zram0
     - dev-zram0.swap
+  ignore_errors: true
 
 - name: Remove ZRAM generator defaults
   ansible.builtin.dnf:

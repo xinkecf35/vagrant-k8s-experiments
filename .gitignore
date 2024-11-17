@@ -1,2 +1,3 @@
 .vagrant
 .kube
+**.DS_Store

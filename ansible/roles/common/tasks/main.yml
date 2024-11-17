@@ -9,6 +9,10 @@
   ansible.builtin.include_tasks:
     file: "{{ ansible_os_family | lower }}.yml"
 
+- name: Install Flannel required binaries
+  ansible.builtin.import_tasks:
+    file: install-cni-plugin.yml
+
 - name: Enable Kernel Parameters
   ansible.builtin.import_tasks:
     file: "sysctl.yml"

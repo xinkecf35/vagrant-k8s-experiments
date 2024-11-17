@@ -1,0 +1,23 @@
+---
+- name: "Create temporary destination for CNI plugin Install"
+  ansible.builtin.tempfile:
+    state: directory
+  register: tmp_dir
+
+- name: Create /opt/cni/bin directory
+  ansible.builtin.file:
+    path: "/opt/cni/bin"
+    mode: "0755"
+    state: directory
+
+- name: Set CNI plugin architecture for download
+  ansible.builtin.set_fact:
+    cni_plugin_architecture: "{{ cni_plugin_arch_lookup[ansible_architecture] }}"
+
+- name: Download and Extract CNI plugin binary to /opt/cni/bin
+  ansible.builtin.unarchive:
+    src: https://github.com/containernetworking/plugins/releases/download/v1.6.0/cni-plugins-linux-{{ cni_plugin_architecture }}-v1.6.0.tgz
+    dest: /opt/cni/bin
+    remote_src: true
+    extra_opts:
+      - --strip-components=1

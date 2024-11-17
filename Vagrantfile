@@ -125,8 +125,8 @@ Vagrant.configure("2") do |config|
           ansible.limit = (1..WORKER_COUNT).to_a.map { |i| "worker-#{i}" }
           ansible.extra_vars = {
             project_kubeconfig_path: project_kubeconfig_path,
-            private_ip: private_ip
           }
+          ansible.host_vars = (1..WORKER_COUNT).to_h { |i| ["worker-#{i}", { "private_ip" => "10.37.132.#{i + 10}" }] }
         end
       end
     end
