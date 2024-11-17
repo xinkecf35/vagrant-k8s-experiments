@@ -1,0 +1,37 @@
+---
+- name: Update Packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+    update_only: true
+
+- name: Add Kubernetes Repository
+  ansible.builtin.yum_repository:
+    name: Kubernetes
+    baseurl:
+      - https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/rpm/
+    enabled: true
+    gpgcheck: true
+    gpgkey:
+      - https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/rpm/repodata/repomd.xml.key
+
+- name: Add CRI-O Repository
+  ansible.builtin.yum_repository:
+    name: CRI-O
+    baseurl:
+      - https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ cri_o_major_version }}/rpm/
+    enabled: true
+    gpgcheck: true
+    gpgkey:
+      - https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ cri_o_major_version }}/rpm/repodata/repomd.xml.key
+
+- name: Install Kubeadm, CRI-O and related packages
+  ansible.builtin.dnf:
+    name:
+      - kubeadm
+      - kubelet
+      - kubectl
+      - cri-o
+      - crun-wasm
+      - container-selinux
+    allow_downgrade: true

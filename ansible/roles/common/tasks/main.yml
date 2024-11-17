@@ -8,7 +8,7 @@
 
 - name: Install and Update Packages
   ansible.builtin.import_tasks:
-    file: "{{ (ansible_distribution == 'Ubuntu') | ternary('ubuntu.yml', 'fedora.yml') }}"
+    file: "{{ ansible_os_family | lower }}.yml"
 
 - name: Disable Swap
   ansible.builtin.import_tasks:
