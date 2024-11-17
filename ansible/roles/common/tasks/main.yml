@@ -5,7 +5,6 @@
     key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/vagrant-k8s-experiments.pub') }}"
     exclusive: true
 
-
 - name: Install and Update Packages
   ansible.builtin.include_tasks:
     file: "{{ ansible_os_family | lower }}.yml"

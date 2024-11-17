@@ -5,7 +5,7 @@
     upgrade: true
 
 - name: Add Required APT repositories
-  ansible.builtin.import_tasks:
+  ansible.builtin.include_tasks:
     file: "k8s-apt-repositories.yml"
 
 - name: Install Kubeadm, CRI-O and related packages
