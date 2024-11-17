@@ -4,33 +4,11 @@
     user: vagrant
     key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/vagrant-k8s-experiments.pub') }}"
     exclusive: true
-- name: "Update and Upgrade Apt Packages"
-  ansible.builtin.apt:
-    update_cache: true
-    upgrade: true
 
-- name: Add Required APT repositories
+
+- name: Install and Update Packages
   ansible.builtin.import_tasks:
-    file: "k8s-apt-repositories.yml"
-
-- name: Install Kubeadm, CRI-O and related packages
-  ansible.builtin.apt:
-    name:
-      - kubeadm
-      - kubelet
-      - kubectl
-      - cri-o
-      - crun
-    allow_downgrade: true
-
-- name: Hold Kubernetes packages
-  ansible.builtin.dpkg_selections:
-    name: "{{ item }}"
-    selection: "hold"
-  loop:
-    - kubeadm
-    - kubelet
-    - kubectl
+    file: "{{ (ansible_distribution == 'Ubuntu') | ternary('ubuntu.yml', 'fedora.yml') }}"
 
 - name: Disable Swap
   ansible.builtin.import_tasks:
@@ -43,7 +21,7 @@
 - name: Configure CRI-O
   ansible.builtin.copy:
     src: crio-crun-runtime.conf
-    dest: /etc/crio/crio.conf.d/crio-crun-runtime.conf
+    dest: /etc/crio/crio.conf.d/
     mode: "0600"
 
 - name: Enable and Start CRI-O service

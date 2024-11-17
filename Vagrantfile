@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-WORKER_COUNT = 1
+WORKER_COUNT = 2
 HYPER_V_SWITCH = "Default Switch"
 VAGRANT_BOX = "bento/ubuntu-24.04"
 VAGRANT_BOX_VERSION = "202407.22.0"
