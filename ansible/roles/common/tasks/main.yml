@@ -9,10 +9,6 @@
   ansible.builtin.include_tasks:
     file: "{{ ansible_os_family | lower }}.yml"
 
-- name: Disable Swap
-  ansible.builtin.import_tasks:
-    file: "disable-swap.yml"
-
 - name: Enable Kernel Parameters
   ansible.builtin.import_tasks:
     file: "sysctl.yml"

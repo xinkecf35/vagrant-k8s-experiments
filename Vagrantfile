@@ -3,7 +3,8 @@
 
 WORKER_COUNT = 2
 HYPER_V_SWITCH = "Default Switch"
-VAGRANT_BOX = "bento/fedora-40"
+# VAGRANT_BOX = "bento/fedora-40"
+VAGRANT_BOX = "bento/ubuntu-24.04"
 VAGRANT_BOX_VERSION = "202407.22.0"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
@@ -74,7 +75,6 @@ Vagrant.configure("2") do |config|
         project_kubeconfig_path: project_kubeconfig_path,
         advertise_ip: private_ip
       }
-      ansible.verbose = "vvvv"
     end 
   end
 

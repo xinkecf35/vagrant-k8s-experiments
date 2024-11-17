@@ -1,4 +1,17 @@
 ---
+# taken from https://github.com/freehck/ansible-role-disable-swap/blob/master/tasks/main.yml
+# and https://github.com/geerlingguy/ansible-role-swap/blob/master/tasks/disable.yml
+- name: Disable swap immediately
+  ansible.builtin.command: swapoff -a
+  changed_when: true
+  when: ansible_swaptotal_mb > 0
+
+- name: Remove swap from fstab
+  ansible.builtin.lineinfile:
+    path: '/etc/fstab'
+    regexp: '\sswap\s'
+    state: 'absent'
+
 - name: "Update and Upgrade Apt Packages"
   ansible.builtin.apt:
     update_cache: true
