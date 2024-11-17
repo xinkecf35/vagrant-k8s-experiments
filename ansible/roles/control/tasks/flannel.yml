@@ -4,7 +4,10 @@
   become: true
   delegate_to: localhost
   block:
+    - name: Set Flannel kustomize directory
+      ansible.builtin.set_fact:
+        flannel_kustomize_dir: "{{ role_path }}/files/flannel"
     - name: Apply Flannel with Kustomize
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig.dest }}"
-        definition: "{{ lookup('kubernetes.core.kustomize', dir='flannel') }}"
+        definition: "{{ lookup('kubernetes.core.kustomize', dir=flannel_kustomize_dir) }}"

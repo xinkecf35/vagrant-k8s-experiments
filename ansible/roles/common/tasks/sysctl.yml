@@ -8,6 +8,7 @@
     name: "{{ item.key }}"
     value: "{{ item.value }}"
     sysctl_set: true
+    sysctl_file: /etc/sysctl.d/99-k8s.conf
   loop: "{{ kernel_params | dict2items }}"
   vars:
     kernel_params:
