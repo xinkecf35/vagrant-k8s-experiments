@@ -3,8 +3,8 @@
 
 WORKER_COUNT = 1
 HYPER_V_SWITCH = "Default Switch"
-VAGRANT_BOX = "bento/ubuntu-22.04"
-VAGRANT_BOX_VERSION = "202112.19.0"
+VAGRANT_BOX = "bento/ubuntu-24.04"
+VAGRANT_BOX_VERSION = "202407.23.0"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
