@@ -15,6 +15,12 @@
     gpgcheck: true
     gpgkey:
       - https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/rpm/repodata/repomd.xml.key
+    exclude:
+      - kubeadm
+      - kubelet
+      - kubectl
+      - cri-tools
+      - kubernetes-cni
 
 - name: Add CRI-O Repository
   ansible.builtin.yum_repository:
@@ -35,6 +41,6 @@
       - kubectl
       - cri-o
       - crun-wasm
-      - container-selinux
     allow_downgrade: true
     state: present
+    disable_excludes: kubernetes

@@ -74,6 +74,7 @@ Vagrant.configure("2") do |config|
         project_kubeconfig_path: project_kubeconfig_path,
         advertise_ip: private_ip
       }
+      ansible.verbose = "vvvv"
     end 
   end
 
