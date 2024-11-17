@@ -8,6 +8,7 @@
 - name: Add Kubernetes Repository
   ansible.builtin.yum_repository:
     name: Kubernetes
+    description: Kubernetes repository from pkg.k8s.io
     baseurl:
       - https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/rpm/
     enabled: true
@@ -18,6 +19,7 @@
 - name: Add CRI-O Repository
   ansible.builtin.yum_repository:
     name: CRI-O
+    description: CRI-O repository from pkg.k8s.io
     baseurl:
       - https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ cri_o_major_version }}/rpm/
     enabled: true
