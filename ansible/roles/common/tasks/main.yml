@@ -40,6 +40,12 @@
   ansible.builtin.import_tasks:
     file: "sysctl.yml"
 
+- name: Configure CRI-O
+  ansible.builtin.copy:
+    src: crio-crun-runtime.conf
+    dest: /etc/crio/crio.conf.d/crio-crun-runtime.conf
+    mode: "0600"
+
 - name: Enable and Start CRI-O service
   ansible.builtin.systemd:
     unit: crio
