@@ -13,13 +13,13 @@
   block:
     - name: "Obtain Kubernetes apt gpg key"
       ansible.builtin.get_url:
-        url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+        url: "https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/deb/Release.key"
         dest: "/usr/share/keyrings/kubernetes-archive-keyring.gpg"
-        mode: 0644
+        mode: "0644"
     - name: "Add Kubernetes repository to APT"
       ansible.builtin.apt_repository:
         # Why no focal?
-        repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
+        repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/deb/ /"
         filename: kubernetes
 
 - name: Setup CRI-O APT repositories
@@ -28,11 +28,14 @@
 - name: Install Kubeadm, CRI-O and related packages
   ansible.builtin.apt:
     name:
-      - kubeadm={{ kube_pkg_version }}
-      - kubelet={{ kube_pkg_version }}
-      - kubectl={{ kube_pkg_version }}
+      - kubeadm
+      - kubelet
+      - kubectl
       - cri-o
       - cri-o-runc
+      - cri-tools
+      - criu
+      - libyajl2
     allow_downgrade: true
 
 - name: Hold Kubernetes packages

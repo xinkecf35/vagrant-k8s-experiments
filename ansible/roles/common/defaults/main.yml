@@ -1,4 +1,3 @@
 ---
-kube_major_version: '1.25'
-kube_pkg_version: 1.25.5-00
-cri_o_os: xUbuntu_20.04
+kube_major_version: '1.30'
+cri_o_major_version: '1.30'

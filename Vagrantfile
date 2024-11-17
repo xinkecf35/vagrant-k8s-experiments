@@ -1,12 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-WORKER_COUNT = 2
+WORKER_COUNT = 1
 HYPER_V_SWITCH = "Default Switch"
-X86_VAGRANT_BOX = "bento/ubuntu-20.04"
-ARM64_VAGRANT_BOX = "bento/ubuntu-20.04-arm64"
-# VAGRANT_BOX = (`arch`.include? "arm64") ? ARM64_VAGRANT_BOX : X86_VAGRANT_BOX
-VAGRANT_BOX = "bento/ubuntu-20.04-arm64"
+VAGRANT_BOX = "bento/ubuntu-22.04"
 VAGRANT_BOX_VERSION = "202112.19.0"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
@@ -44,6 +41,7 @@ Vagrant.configure("2") do |config|
 
     # Configure general private networking
     control.vm.network "private_network", ip: private_ip
+    control.vm.network "forwarded_port", guest: 6443, host: 6443
     
     # Hyper-V Specific Configuration
     control.vm.provider "hyperv" do |h, override|

@@ -12,7 +12,7 @@
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/flannel-io/flannel/v0.20.2/Documentation/kube-flannel.yml
         dest: "{{ tmp_dir.path }}"
-        mode: '0644'
+        mode: "0644"
       register: flannel_manifest_file
     - name: Apply Flannel Manifest
       kubernetes.core.k8s:
