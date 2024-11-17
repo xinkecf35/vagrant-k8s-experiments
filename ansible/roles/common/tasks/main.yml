@@ -20,7 +20,7 @@
 - name: Configure CRI-O
   ansible.builtin.copy:
     src: crio-crun-runtime.conf
-    dest: /etc/crio/crio.conf.d/
+    dest: /etc/crio/crio.conf
     mode: "0600"
 
 - name: Enable and Start CRI-O service

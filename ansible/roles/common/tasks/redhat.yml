@@ -70,5 +70,6 @@
       - kubectl
       - cri-o
       - crun-wasm
+      - wasmedge
     allow_downgrade: true
     state: present
