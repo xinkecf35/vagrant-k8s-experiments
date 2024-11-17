@@ -3,6 +3,8 @@
 
 WORKER_COUNT = 2
 HYPER_V_SWITCH = "Default Switch"
+X86_VAGRANT_BOX = "bento/ubuntu-20.04"
+ARM64_VAGRANT_BOX = "bento/ubuntu-20.04-arm64"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -28,7 +30,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "control", primary: true do |control|
     hostname = "vagrant-k8s-control"
-    control.vm.box = "bento/ubuntu-20.04"
+    control.vm.box = ARM64_VAGRANT_BOX
     control.vm.hostname = hostname
     
     # Hyper-V Specific Configuration
@@ -46,6 +48,15 @@ Vagrant.configure("2") do |config|
       control.vm.network "public_network", bridge: HYPER_V_SWITCH
     end
 
+    control.vm.provider "parallels" do |p|
+      p.name = hostname
+
+      p.cpus = 2
+      p.memory = 4096
+
+      # TODO: set networking + static ip?
+    end
+
     # Provision node with playbooks
     control.vm.provision "ansible" do |ansible|
       ansible.playbook = "ansible/k8s-control.yml"
@@ -59,7 +70,7 @@ Vagrant.configure("2") do |config|
   (1..WORKER_COUNT).each do |i|
     config.vm.define "worker-#{i}" do |worker|
       hostname = "vagrant-k8s-worker-#{i}"
-      worker.vm.box = "bento/ubuntu-20.04"
+      worker.vm.box = ARM64_VAGRANT_BOX
       worker.vm.hostname = hostname
     
       # Hyper-V Specific Configuration
@@ -75,6 +86,15 @@ Vagrant.configure("2") do |config|
 
          # Set Hyper-V Switch to use; note Default Switch IPs aren't stable
         worker.vm.network "public_network", bridge: HYPER_V_SWITCH
+      end
+
+      worker.vm.provider "parallels" do |p|
+        p.name = hostname
+  
+        p.cpus = 2
+        p.memory = 4096
+  
+        # TODO: set networking + static ip?
       end
 
       # Provision nodes with playbooks
