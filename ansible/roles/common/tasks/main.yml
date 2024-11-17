@@ -9,22 +9,10 @@
     update_cache: true
     upgrade: true
 
-- name: Setup Kubernetes APT repository
-  block:
-    - name: "Obtain Kubernetes apt gpg key"
-      ansible.builtin.get_url:
-        url: "https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/deb/Release.key"
-        dest: "/usr/share/keyrings/kubernetes-archive-keyring.gpg"
-        mode: "0644"
-    - name: "Add Kubernetes repository to APT"
-      ansible.builtin.apt_repository:
-        # Why no focal?
-        repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/deb/ /"
-        filename: kubernetes
+- name: Add Required APT repositories
+  ansible.builtin.import_tasks:
+    file: "k8s-apt-repositories.yml"
 
-- name: Setup CRI-O APT repositories
-  ansible.builtin.include_tasks:
-    file: "cri-o.yml"
 - name: Install Kubeadm, CRI-O and related packages
   ansible.builtin.apt:
     name:
@@ -48,10 +36,11 @@
     - kubectl
 
 - name: Disable Swap
-  ansible.builtin.include_tasks:
+  ansible.builtin.import_tasks:
     file: "disable-swap.yml"
+
 - name: Enable Kernel Parameters
-  ansible.builtin.include_tasks:
+  ansible.builtin.import_tasks:
     file: "sysctl.yml"
 
 - name: Enable and Start CRI-O service

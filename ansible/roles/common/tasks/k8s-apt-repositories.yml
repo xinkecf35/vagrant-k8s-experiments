@@ -1,0 +1,50 @@
+---
+- name: Configure Kubernetes APT repository
+  block:
+    - name: Check if pkg.k8s.io keyring is present
+      ansible.builtin.stat:
+        path: "/usr/share/keyrings/kubernetes-archive-keyring.gpg"
+      register: is_pkg_k8s_io_keyring_present
+
+    - name: "Setup pkg.k8s.io keyring"
+      when: not is_pkg_k8s_io_keyring_present.stat.exists
+      block:
+        - name: Download pkg.k8s.io kubernetes-apt-keyring
+          ansible.builtin.get_url:
+            url: "https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/deb/Release.key"
+            dest: "/tmp/kubernetes-apt-keyring.asc"
+            mode: "0644"
+        - name: "Dearmor pkg.k8s.io key kubernetes-apt-keyring"
+          ansible.builtin.command: "gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg /tmp/kubernetes-apt-keyring.asc"
+          args:
+            creates: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+
+    - name: "Add Kubernetes APT repository"
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ kube_major_version }}/deb/ /"
+        filename: kubernetes
+
+- name: Configure CRI-O APT repository
+  block:
+    - name: Check if cri-o-apt-keyring is present
+      ansible.builtin.stat:
+        path: /usr/share/keyrings/cri-o-apt-keyring.gpg
+      register: is_cri_o_keyring_present
+
+    - name: "Setup CRI-O cri-o-apt-keyring"
+      when: not is_cri_o_keyring_present.stat.exists
+      block:
+        - name: Download CRI-O key cri-o-apt-keyring
+          ansible.builtin.get_url:
+            url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ cri_o_os }}/Release.key"
+            dest: "/tmp/cri-o-apt-keyring.asc"
+            mode: "0644"
+        - name: "Dearmor CRI-O key cri-o-apt-keyring"
+          ansible.builtin.command: "gpg --dearmor -o /usr/share/keyrings/cri-o-apt-keyring.gpg /tmp/cri-o-apt-keyring.asc"
+          args:
+            creates: /usr/share/keyrings/cri-o-apt-keyring.gpg
+
+    - name: "Add CRI-O APT repository"
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ cri_o_major_version }}/deb/ /"
+        filename: cri-o
