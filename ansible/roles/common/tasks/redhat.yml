@@ -5,12 +5,15 @@
     state: latest
     update_only: true
 
-# Disable Swap, mechanism is different as Fedora uses ZRAM/creates a RAM drive...
-# - name: Disable swap immediately
-#   ansible.builtin.systemd:
-#     unit: swap-create@zram0
-#     enabled: false
-#     state: stopped
+# mechanism is different as Fedora uses ZRAM/creates a RAM drive...
+- name: Disable swap unit immediately
+  ansible.builtin.systemd:
+    unit: "{{ item }}"
+    enabled: false
+    state: stopped
+  loop:
+    - systemd-zram-setup@zram0
+    - dev-zram0.swap
 
 - name: Remove ZRAM generator defaults
   ansible.builtin.dnf:
