@@ -69,7 +69,7 @@
       - kubelet
       - kubectl
       - cri-o
-      - crun-wasm
+      - crun
       - wasmedge
     allow_downgrade: true
     state: present

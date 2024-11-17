@@ -16,7 +16,7 @@
     src: /etc/kubernetes/admin.conf
     dest: "{{ project_kubeconfig_path }}"
     flat: true
-  register: admin_kubeconfig
+  register: kubeconfig
 
 # # Technically not needed for Parrallels, but hoping it will give me consistent access for all providers
 # - name: Remap private ip address to 127.0.0.1

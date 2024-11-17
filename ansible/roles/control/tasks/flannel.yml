@@ -4,17 +4,7 @@
   become: true
   delegate_to: localhost
   block:
-    - name: "Create temporary destination for Flannel Install"
-      ansible.builtin.tempfile:
-        state: directory
-      register: tmp_dir
-    - name: "Download Flannel Manifest"
-      ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/flannel-io/flannel/v0.26.1/Documentation/kube-flannel.yml
-        dest: "{{ tmp_dir.path }}"
-        mode: "0644"
-      register: flannel_manifest_file
-    - name: Apply Flannel Manifest
+    - name: Apply Flannel with Kustomize
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig.dest }}"
-        src: "{{ flannel_manifest_file.dest }}"
+        definition: "{{ lookup('kubernetes.core.kustomize', dir='flannel') }}"
