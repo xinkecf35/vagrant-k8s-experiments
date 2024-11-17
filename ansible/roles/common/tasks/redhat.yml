@@ -1,17 +1,21 @@
 ---
 - name: Configure private interface eth1 with static ip
   block:
-    - name: Template and copy NetworkManager Keyfile
-      ansible.builtin.template:
-        src: nm-keyfile.ini.j2
-        dest: /etc/NetworkManager/system-connections/private-vagrant-interface.nmconnection
-        mode: "0644"
-        owner: root
-        group: root
-    - name: Apply new interface config
-      ansible.builtin.command:
-        nmcli conn reload
-      changed_when: true
+    - name: Delete any previous configured private interface
+      community.general.nmcli:
+        conn_name: Wired connection 2
+        state: absent
+        conn_reload: true
+    - name: Create new eth1 interface
+      community.general.nmcli:
+        conn_name: Private Vagrant Interface
+        ifname: eth1
+        ip4: "{{ private_ip }}/24"
+        method4: manual
+        type: ethernet
+        state: present
+        conn_reload: true
+
 
 - name: Update Packages
   ansible.builtin.dnf:
