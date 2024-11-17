@@ -41,6 +41,8 @@ Vagrant.configure("2") do |config|
     control.vm.hostname = hostname
 
     # Configure general private networking
+    # NOTE: not letting Vagrant configure the networking because it doesn't do so correctly for Fedora
+    # See https://github.com/hashicorp/vagrant/issues/12762
     control.vm.network "private_network", ip: private_ip, auto_config: false
     control.vm.network "forwarded_port", guest: 6443, host: 6443
     
@@ -92,6 +94,8 @@ Vagrant.configure("2") do |config|
       worker.vm.hostname = hostname
       
       # Configure general private networking
+      # NOTE: not letting Vagrant configure the networking because it doesn't do so correctly for Fedora
+      # See https://github.com/hashicorp/vagrant/issues/12762
       worker.vm.network "private_network", ip: private_ip, auto_config: false
 
       # Hyper-V Specific Configuration
