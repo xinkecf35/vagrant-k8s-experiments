@@ -37,3 +37,4 @@
       - crun-wasm
       - container-selinux
     allow_downgrade: true
+    state: present
