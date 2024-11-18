@@ -4,6 +4,7 @@
 WORKER_COUNT = 2
 HYPER_V_SWITCH = "Default Switch"
 VAGRANT_BOX = "bento/fedora-40"
+# VAGRANT_BOX_VERSION = "202404.23.0"
 # VAGRANT_BOX = "bento/ubuntu-24.04"
 VAGRANT_BOX_VERSION = "202407.22.0"
 
@@ -39,6 +40,7 @@ Vagrant.configure("2") do |config|
     bridged_ip = "10.211.55.10"
     private_ip = "10.37.132.10"
     control.vm.hostname = hostname
+    control.vm.synced_folder ".", "/vagrant", disabled: true
 
     # Configure general private networking
     # NOTE: not letting Vagrant configure the networking because it doesn't do so correctly for Fedora
@@ -67,7 +69,11 @@ Vagrant.configure("2") do |config|
       p.cpus = 2
       p.memory = 4096
 
+      # p.update_guest_tools = true
+
+      # temporary addition while I figure/wait out Parallels Guest Tools to support Linux 6.6/Fedora 38 and greater
       p.check_guest_tools = false
+      override.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_version: 3, nfs_udp: false
     end
 
     # Provision node with playbooks
@@ -92,12 +98,13 @@ Vagrant.configure("2") do |config|
       hostname = "vagrant-k8s-worker-#{i}"
       private_ip = "10.37.132.#{i + 10}"
       worker.vm.hostname = hostname
+      worker.vm.synced_folder ".", "/vagrant", disabled: true
+
       
       # Configure general private networking
       # NOTE: not letting Vagrant configure the networking because it doesn't do so correctly for Fedora
       # See https://github.com/hashicorp/vagrant/issues/12762
       worker.vm.network "private_network", ip: private_ip, auto_config: false
-
       # Hyper-V Specific Configuration
       worker.vm.provider "hyperv" do |h, override|
         h.vmname = hostname
@@ -119,7 +126,11 @@ Vagrant.configure("2") do |config|
         p.cpus = 2
         p.memory = 4096
         
+        # p.update_guest_tools = true
+
+        # temporary addition while I figure/wait out Parallels Guest Tools to support Linux 6.6/Fedora 38 and greater
         p.check_guest_tools = false
+        override.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_version: 3, nfs_udp: false
       end
 
       # Provision nodes with playbooks
