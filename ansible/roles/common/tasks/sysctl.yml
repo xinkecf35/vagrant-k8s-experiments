@@ -3,6 +3,14 @@
   community.general.modprobe:
     name: br_netfilter
     state: present
+
+- name: Enable br_netfilter module to be loaded at boot
+  ansible.builtin.copy:
+    content: >
+       br_netfilter
+    dest: /etc/modules-load.d/br_netfilter.conf
+    mode: "0644"
+
 - name: Enable Kernel Parameters
   ansible.posix.sysctl:
     name: "{{ item.key }}"
