@@ -42,11 +42,16 @@ Vagrant.configure("2") do |config|
     control.vm.hostname = hostname
     control.vm.synced_folder ".", "/vagrant", disabled: true
 
-    # Configure general private networking
+    ## Configure general private networking
+
     # NOTE: not letting Vagrant configure the networking because it doesn't do so correctly for Fedora
     # See https://github.com/hashicorp/vagrant/issues/12762
     control.vm.network "private_network", ip: private_ip, auto_config: false
+    
+    # Port Forward for API server and NGINX ingress
     control.vm.network "forwarded_port", guest: 6443, host: 6443
+    control.vm.network "forwarded_port", guest: 443, host: 8443
+    control.vm.network "forwarded_port", guest: 80, host: 8080
     
     # Hyper-V Specific Configuration
     control.vm.provider "hyperv" do |h, override|
