@@ -28,20 +28,33 @@
 #     regexp: "{{ private_ip | regex_escape() }}"
 #     replace: 127.0.0.1
 
-- name: "Label node as worker node as well as control"
-  become_user: "{{ lookup('env', 'USER') }}"
-  become: true
-  delegate_to: localhost
-  kubernetes.core.k8s:
-    kind: Node
-    version: v1
-    kubeconfig: "{{ project_kubeconfig_path }}"
-    state: patched
-    name: "{{ ansible_hostname }}"
-    definition:
-      metadata:
-        labels:
-          "node-role.kubernetes.io/worker": ""
+- name: Allow dev workloads to schedule on control plane
+  block:
+    - name: "Label node as worker node as well as control"
+      become_user: "{{ lookup('env', 'USER') }}"
+      become: true
+      delegate_to: localhost
+      kubernetes.core.k8s:
+        kind: Node
+        version: v1
+        kubeconfig: "{{ project_kubeconfig_path }}"
+        state: patched
+        name: "{{ ansible_hostname }}"
+        definition:
+          metadata:
+            labels:
+              "node-role.kubernetes.io/worker": ""
+    - name: "Remove control plane taint so workloads will be placed"
+      become_user: "{{ lookup('env', 'USER') }}"
+      become: true
+      delegate_to: localhost
+      kubernetes.core.k8s_taint:
+        state: absent
+        name: "{{ ansible_hostname }}"
+        taints:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/control-plane
+
 - name: "Install Flannel CNI"
   ansible.builtin.import_tasks:
     file: "flannel.yml"
