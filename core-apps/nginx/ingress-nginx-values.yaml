@@ -1,0 +1,10 @@
+controller:
+  containerPort:
+    http: 80
+    https: 443
+  dnsPolicy: ClusterFirstWithHostNet
+  hostNetwork: true
+  service:
+    enabled: false
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
