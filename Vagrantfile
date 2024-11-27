@@ -77,8 +77,9 @@ Vagrant.configure("2") do |config|
       # p.update_guest_tools = true
 
       # temporary addition while I figure/wait out Parallels Guest Tools to support Linux 6.6/Fedora 38 and greater
+      # nolock is temporary as well while I try to figure out locking issues with macOS nfsd
       p.check_guest_tools = false
-      override.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_version: 3, nfs_udp: false
+      override.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_version: 3, nfs_udp: false, mount_options: ["nolock"]
     end
 
     # Provision node with playbooks
@@ -134,8 +135,9 @@ Vagrant.configure("2") do |config|
         # p.update_guest_tools = true
 
         # temporary addition while I figure/wait out Parallels Guest Tools to support Linux 6.6/Fedora 38 and greater
+        # nolock is temporary as well while I try to figure out locking issues with macOS nfsd
         p.check_guest_tools = false
-        override.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_version: 3, nfs_udp: false
+        override.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_version: 3, nfs_udp: false, mount_options: ["nolock"]
       end
 
       # Provision nodes with playbooks
