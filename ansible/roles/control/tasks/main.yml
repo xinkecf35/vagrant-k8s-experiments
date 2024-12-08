@@ -35,25 +35,27 @@
       become: true
       delegate_to: localhost
       kubernetes.core.k8s:
+        kubeconfig: "{{ project_kubeconfig_path }}"
         kind: Node
         version: v1
-        kubeconfig: "{{ project_kubeconfig_path }}"
-        state: patched
         name: "{{ ansible_hostname }}"
         definition:
           metadata:
             labels:
               "node-role.kubernetes.io/worker": ""
+        state: patched
+
     - name: "Remove control plane taint so workloads will be placed"
       become_user: "{{ lookup('env', 'USER') }}"
       become: true
       delegate_to: localhost
       kubernetes.core.k8s_taint:
-        state: absent
+        kubeconfig: "{{ project_kubeconfig_path }}"
         name: "{{ ansible_hostname }}"
         taints:
           - effect: NoSchedule
             key: node-role.kubernetes.io/control-plane
+        state: absent
 
 - name: "Install Flannel CNI"
   ansible.builtin.import_tasks:
