@@ -10,10 +10,17 @@ configFiles:
       "extensions": { "enabled": true }
     }
 
+service:
+  type: ClusterIP
+
 ingress:
-  enabled: false
+  enabled: true
   className: nginx
   pathtype: Prefix
+  hosts:
+    - host: zot-registry.apps.vagrant-k8s-experiments.test
+      paths:
+        - path: /
 
 persistence: true
 

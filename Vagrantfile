@@ -50,8 +50,8 @@ Vagrant.configure("2") do |config|
     
     # Port Forward for API server and NGINX ingress
     control.vm.network "forwarded_port", guest: 6443, host: 6443
-    control.vm.network "forwarded_port", guest: 443, host: 8443
-    control.vm.network "forwarded_port", guest: 80, host: 8080
+    control.vm.network "forwarded_port", guest: 8443, host: 8443
+    control.vm.network "forwarded_port", guest: 8080, host: 8080
     
     # Hyper-V Specific Configuration
     control.vm.provider "hyperv" do |h, override|
